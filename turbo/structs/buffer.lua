@@ -27,10 +27,8 @@ ffi.cdef([[
     };
 ]])
 
-if not _G._BUFFER_H then
-    _G._BUFFER_H = 1
-
-end
+_G._tbuffer_list = {}
+local _tbuffer_list = _G._tbuffer_list
 
 --- Low-level Buffer class.
 -- Using C buffers. This class supports storing above the LuaJIT memory limit.
@@ -39,6 +37,10 @@ local Buffer = class('Buffer')
 
 local function _tbuffer_free(ptr)
     ptr = ffi.cast("struct tbuffer *",  ptr)
+    if #_tbuffer_list < 200 then
+        table.insert(_tbuffer_list, ptr)
+        return
+    end
     ffi.C.free(ptr.data)
     ffi.C.free(ptr)
 end
@@ -48,6 +50,16 @@ end
 -- @return Buffer instance.
 function Buffer:initialize(size_hint)
     size_hint = size_hint or 1024
+    for i=1, #_tbuffer_list do
+        if _tbuffer_list[i].mem >= size_hint then
+            self.tbuffer = _tbuffer_list[i]
+            self.tbuffer.sz = 0
+            self.tbuffer.sz_hint = size_hint
+            table.remove(_tbuffer_list, i)
+            ffi.gc(self.tbuffer, _tbuffer_free)
+            return
+        end
+    end
     local ptr = ffi.C.malloc(ffi.sizeof("struct tbuffer"))
     if ptr == nil then
         error("No memory.")
