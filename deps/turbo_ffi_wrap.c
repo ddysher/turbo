@@ -293,3 +293,10 @@ void turbo_parser_wrapper_exit(struct turbo_parser_wrapper *src)
     free(src);
 }
 
+bool headers_parsed_ok(const struct turbo_parser_wrapper* tpw)
+{
+    if (tpw->parser.http_errno == 0 && tpw->parsed_sz != 0)
+        return true;
+    else
+        return false;
+}

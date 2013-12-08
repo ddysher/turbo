@@ -88,6 +88,7 @@ char *url_field(
         const char *url_str,
         const struct http_parser_url *url,
         enum http_parser_url_fields prop);
+bool headers_parsed_ok(const struct turbo_parser_wrapper* tpw);
 
 
 // OpenSSL wrapper functions.

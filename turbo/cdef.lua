@@ -436,4 +436,5 @@ extern char *url_field(const char *url_str, const struct http_parser_url *url, e
 const char *http_errno_name(int32_t err);
 const char *http_errno_description(int32_t err);
 int32_t validate_hostname(const char *hostname, const SSL *server);
+bool headers_parsed_ok(const struct turbo_parser_wrapper* tpw);
 ]]
